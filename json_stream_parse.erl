@@ -309,8 +309,7 @@ toke_string(DF, <<$\\,$t,Rest/binary>>, Acc) ->
     toke_string(DF, Rest, [$\t | Acc]);
 toke_string(DF, <<$\\,$u,Rest/binary>>, Acc) ->
     {<<A,B,C,D,Data/binary>>, DF2} = must_df(DF,4,Rest,missing_hex),
-    UTFChar = (16*16*16*hexdigit_to_num(A)) + (16*16*hexdigit_to_num(B)) +
-        (16*hexdigit_to_num(C)) + hexdigit_to_num(D),
+    UTFChar = erlang:list_to_integer([A, B, C, D], 16),
     if UTFChar == 16#FFFF orelse UTFChar == 16#FFFE ->
         err(invalid_utf_char);
     true ->
@@ -327,17 +326,6 @@ toke_string(DF, <<$", Rest/binary>>, Acc) ->
     {list_to_binary(lists:reverse(Acc)), DF, Rest};
 toke_string(DF, <<C, Rest/binary>>, Acc) ->
     toke_string(DF, Rest, [C | Acc]).
-
-
-hexdigit_to_num(X) when X >= $0 andalso X =< $9 ->
-    X - $0;
-hexdigit_to_num(X) when X >= $A andalso X =< $F ->
-    X - $A;
-hexdigit_to_num(X) when X >= $a andalso X =< $f ->
-    X - $a;
-hexdigit_to_num(_) ->
-    err(invalid_hexdigit).
-
 
 
 toke_number_leading(DF, <<Digit,Rest/binary>>, Acc)

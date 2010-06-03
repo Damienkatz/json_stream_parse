@@ -1,0 +1,7 @@
+json_stream_parse README
+========================
+
+This is a streaming, evented JSON parser written in Erlang. It allows the
+JSON to be streamed as it's parsed, and as each JSON element is parsed it
+calls the user supplied event function.
+
